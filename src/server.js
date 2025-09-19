@@ -1,6 +1,7 @@
 const express = require('express'),
   User = require('./core/User'),
-  Product = require('./core/Products');
+  Product = require('./core/Products'),
+  Cart = require('./core/cart');
 
 const port = 3000;
 
@@ -89,3 +90,63 @@ server.get('/users/remove', async (req, res) => {
     res.send(`[SUCCESS] User deleted.`)
 });
 
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= CART PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
+server.get('/cart', async (req, res) => {
+    const carts = await Cart.getCarts();
+    res.send(carts);
+});
+
+server.get('/cart/add', async (req, res) => {
+    const userID = req.query.userID;
+    const productID = req.query.productID;
+    const quantity = req.query.quantity || 1;
+
+    if(!userID || !productID || !parseInt(userID) || !parseInt(productID)) {
+      console.log(`[ERROR]: Missing Arguments`)
+      res.send(`[ERROR]: Missing Arguments`)
+      return;
+    }
+
+    const user = await User.getUserById(parseInt(userID));
+    const product = await Product.getProductById(parseInt(productID));
+
+    if(!user) {
+      console.log(`[ERROR]: User not found`)
+      res.send(`[ERROR]: User not found`)
+      return;
+    }
+
+    if(!product) {
+      console.log(`[ERROR]: Product not found`)
+      res.send(`[ERROR]: Product not found`)
+      return;
+    }
+
+    if(product.stock < quantity) {
+      console.log(`[ERROR]: Not enough stock available`)
+      res.send(`[ERROR]: Not enough stock available`)
+      return;
+    }
+
+    product.stock = product.stock - quantity;
+    await Product.updateProduct(product.id, { stock: product.stock });
+    
+    await Cart.addCartItem(user.id, product.id, quantity);
+    res.send(`[SUCCESS] Item added to your cart.`)
+});
+
+server.get('/cart/remove', async (req, res) => {
+    const userID = req.query.userID;
+    const productID = req.query.productID;
+
+    if(!userID || !productID || !parseInt(userID) || !parseInt(productID)) {
+      console.log(`[ERROR]: Missing Arguments`)
+      res.send(`[ERROR]: Missing Arguments`)
+      return;
+    }
+
+    await Cart.remCartItem(productID, userID);
+
+    res.send(`[SUCCESS] Item removed from your cart.`)
+});

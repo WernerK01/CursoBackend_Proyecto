@@ -18,6 +18,7 @@ class Product {
     }
 
     static async getProductById(id) {
+        if(!this.#products.length == 0) this.#products = await this.getProducts();
         try {
             return this.#products.find(p => p.id === id) || null;
         } catch(err) {
@@ -27,6 +28,7 @@ class Product {
     }
 
     static async addProduct(product) {
+        if(!this.#products.length == 0) this.#products = await this.getProducts();
         const exist = this.#products.find(p => p.title == product.title);
         if(exist) {
             console.log(`[LOG]: The product ${product.title} is already in the data.`);
@@ -45,6 +47,23 @@ class Product {
         } catch(err) {
             console.log(`[ERROR]: Writing products data: ${err}`);
             throw new Error('Error writing products data');
+        }
+    }
+
+    static async updateProduct(id, updatedFields) {
+        if(!this.#products.length == 0) this.#products = await this.getProducts();
+        try {
+            const productIndex = this.#products.findIndex(p => p.id === id);
+            if(productIndex === -1) {
+                console.log(`[LOG]: Product with ID ${id} not found.`);
+                return;
+            }
+            
+            this.#products[productIndex] = { ...this.#products[productIndex], ...updatedFields };
+            await fs.promises.writeFile(this.#path, JSON.stringify(this.#products, null, 5), 'utf-8');
+        } catch(err) {
+            console.log(`[ERROR]: Updating product data: ${err}`);
+            throw new Error('Error updating product data');
         }
     }
 

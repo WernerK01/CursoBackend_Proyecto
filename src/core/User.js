@@ -19,7 +19,7 @@ class User {
     }
 
     static async getUserById(id) {
-        if(!this.#users) this.#users = await this.getUsers();
+        if(!this.#users.length == 0) this.#users = await this.getUsers();
         try {
             return this.#users.find(user => user.id === id) || null;
         } catch(err) {
@@ -29,8 +29,7 @@ class User {
     }
 
     static async addUser(user) {
-        if(!this.#users) this.#users = await this.getUsers();
-
+        if(!this.#users.length == 0) this.#users = await this.getUsers();
         const exist = this.#users.find(u => u.mail == user.mail);
         if(exist) {
             console.log(`[LOG]: The user ${user.name} is already in the data.`);
@@ -54,7 +53,7 @@ class User {
     }
 
     static async remUser(id) {
-        if(!this.#users) this.#users = await this.getUsers();
+        if(!this.#users.length == 0) this.#users = await this.getUsers();
         try {
             const user = this.getUserById(id);
             if(!user) return null;
