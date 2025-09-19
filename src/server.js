@@ -94,6 +94,14 @@ server.get('/users/remove', async (req, res) => {
 
 server.get('/cart', async (req, res) => {
     const carts = await Cart.getCarts();
+
+    const userID = req.query.userID;
+    if(userID && parseInt(userID)) {
+        const userCart = carts.filter(c => c.userID == userID);
+        res.send(userCart);
+        return;
+    }
+    
     res.send(carts);
 });
 
