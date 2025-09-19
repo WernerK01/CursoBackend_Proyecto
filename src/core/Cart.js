@@ -52,6 +52,22 @@ class Cart {
         }
     }
 
+    static async updateCartItem(userID, productID, updatedFields) {
+        if(!this.#carts.length == 0) this.#carts = await this.getCarts();
+        try {
+            const cartIndex = this.#carts.findIndex(c => c.userID === userID && c.productID === productID);
+            if(cartIndex === -1) {
+                console.log(`[LOG]: Cart item with UserID ${userID} and ProductID ${productID} not found.`);
+                return;
+            }
+            this.#carts[cartIndex] = { ...this.#carts[cartIndex], ...updatedFields };
+            await fs.promises.writeFile(this.#path, JSON.stringify(this.#carts, null, 5), 'utf-8');
+        } catch(err) {
+            console.log(`[ERROR]: Updating user cart data: ${err}`);
+            throw new Error('Error updating user cart data');
+        }
+    }
+
     static async remCartItem(userID, productID) {
         try {
             const cart = this.getUserCart(userID, productID);
