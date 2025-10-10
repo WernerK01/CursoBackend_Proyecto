@@ -1,7 +1,20 @@
 [
      {
-          "title": "Teclado",
-          "stock": 95,
+          "name": "Teclado",
+          "stock": 139,
+          "price": 150,
           "id": 1
+     },
+     {
+          "name": "Mouse",
+          "stock": 30,
+          "price": 200,
+          "id": 2
+     },
+     {
+          "name": "Auriculares",
+          "stock": "50",
+          "price": "300",
+          "id": 3
      }
 ]

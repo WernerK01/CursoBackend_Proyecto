@@ -1,160 +1,59 @@
-const express = require('express'),
-  User = require('./core/User'),
-  Product = require('./core/Products'),
-  Cart = require('./core/cart');
+import express from 'express';
+import handlebars from 'express-handlebars';
+import { Product } from './core/Products.js';
+import { Server } from 'socket.io';
+
+import cartRoute from './routes/cart/cart.js';
+import cartAddRoute from './routes/cart/add.js';
+import cartGetByIDRoute from './routes/cart/get.js';
+import cartRemoveRoute from './routes/cart/remove.js';
+
+import productsRoute from './routes/products/products.js';
+import productAddRoute from './routes/products/add.js';
+import productGetByIDRoute from './routes/products/get.js';
+import productsRemoveRoute from './routes/products/remove.js';
+import realTimeProductRoute from './routes/products/realTimeProducts.js';
 
 const port = 3000;
-
 const server = express();
 
-server.listen(port, async () => {
-  await User.getUsers();
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
+server.use(express.static('./src/public'));
+
+server.set('view engine', 'handlebars');
+server.set('views', './src/views');
+
+server.engine('handlebars', handlebars.engine());
+
+
+const serverHTTP = server.listen(port, async () => {
   await Product.getProducts();
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`[READY] Server is running on http://localhost:${port}`);
 });
 
 server.get('/', (req, res) => {
-    res.send(`¡Hello new costumer!\nPlease for use our services in the link type '/users' or '/products'.\n¡Thanks you!`);
+  res.render('layouts/main', { title: '¡Hello new costumer!', message: 'Please for use our services in the link type \'/cart\' or \'/products\'.\n\n¡Thanks you' });
 });
-
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= PRODUCT PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-server.get('/products', async (req, res) => {
+const socket = new Server(serverHTTP);
+setInterval(async () => {
   const products = await Product.getProducts();
-  res.send(products);
-});
+  socket.emit('realTimeProducts', products);
+  let temp = Math.floor(Math.random() * 100);
+  socket.emit('temp', temp);
+}, 1000);
 
-server.get('/products/add', async (req, res) => {
-  const product = {
-    title: req.query.name,
-    stock: req.query.stock,
-    price: req.query.price,
-  }
 
-  if(!product.title || !product.stock) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-  }
-
-  Product.addProduct(product);
-  res.send(`[SUCCESS]: Product added.`)
-});
-
-server.get('/products/remove', async (req, res) => {
-  const id = req.query.id;
-
-  if(!id) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-  }
-
-  Product.remProduct(id);
-  res.send(`[SUCCESS]: Product deleted.`)
-});
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= USER PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-server.get('/users', async (req, res) => {
-    const users = await User.getUsers();
-    res.send(users);
-});
-
-server.get('/users/add', async (req, res) => {
-    const user = {
-      name: req.query.name,
-      lastName: req.query.lastName,
-      mail: req.query.mail,
-      password: req.query.password
-    }
-
-    if(!user.name || !user.lastName || !user.mail || !user.password) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-    }
-    User.addUser(user);
-    res.send(`[SUCCESS] User created.`)
-});
-
-server.get('/users/remove', async (req, res) => {
-    const id = req.query.id
-
-    if(!id) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-    }
-
-    User.remUser(id);
-    res.send(`[SUCCESS] User deleted.`)
-});
+server.use('/products', productsRoute);
+server.use('/products/add', productAddRoute);
+server.use('/products/get', productGetByIDRoute);
+server.use('/products/remove', productsRemoveRoute);
+server.use('/realTimeProducts', realTimeProductRoute);
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= CART PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-server.get('/cart', async (req, res) => {
-    const carts = await Cart.getCarts();
-
-    const userID = req.query.userID;
-    if(userID && parseInt(userID)) {
-        const userCart = carts.filter(c => c.userID == userID);
-        res.send(userCart);
-        return;
-    }
-    
-    res.send(carts);
-});
-
-server.get('/cart/add', async (req, res) => {
-    const userID = req.query.userID;
-    const productID = req.query.productID;
-    const quantity = req.query.quantity || 1;
-
-    if(!userID || !productID || !parseInt(userID) || !parseInt(productID)) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-    }
-
-    const user = await User.getUserById(parseInt(userID));
-    const product = await Product.getProductById(parseInt(productID));
-
-    if(!user) {
-      console.log(`[ERROR]: User not found`)
-      res.send(`[ERROR]: User not found`)
-      return;
-    }
-
-    if(!product) {
-      console.log(`[ERROR]: Product not found`)
-      res.send(`[ERROR]: Product not found`)
-      return;
-    }
-
-    if(product.stock < quantity) {
-      console.log(`[ERROR]: Not enough stock available`)
-      res.send(`[ERROR]: Not enough stock available`)
-      return;
-    }
-
-    product.stock = product.stock - quantity;
-    await Product.updateProduct(product.id, { stock: product.stock });
-    
-    await Cart.addCartItem(user.id, product.id, quantity);
-    res.send(`[SUCCESS] Item added to your cart.`)
-});
-
-server.get('/cart/remove', async (req, res) => {
-    const userID = req.query.userID;
-    const productID = req.query.productID;
-
-    if(!userID || !productID || !parseInt(userID) || !parseInt(productID)) {
-      console.log(`[ERROR]: Missing Arguments`)
-      res.send(`[ERROR]: Missing Arguments`)
-      return;
-    }
-
-    await Cart.remCartItem(productID, userID);
-
-    res.send(`[SUCCESS] Item removed from your cart.`)
-});
+server.use('/cart', cartRoute);
+server.use('/cart/add', cartAddRoute);
+server.use('/cart/get', cartGetByIDRoute);
+server.use('/cart/remove', cartRemoveRoute);

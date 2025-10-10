@@ -1,7 +1,6 @@
 [
      {
-          "userID": 1,
           "productID": 1,
-          "quantity": "5"
+          "quantity": 7
      }
 ]
