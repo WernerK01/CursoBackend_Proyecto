@@ -87,9 +87,7 @@ router.post('/', async (req, res) => {
 
 router.post('/:id/products/:pid', async (req, res) => {
     const { id, pid } = req.params;
-
-    let qty;
-    if (req.body?.quantity) qty = req.body.quantity;
+    const quantity = req.body?.quantity ?? 1;
 
     res.setHeader('Content-Type', 'application/json');
 
@@ -97,20 +95,27 @@ router.post('/:id/products/:pid', async (req, res) => {
 
     try {
         await existProduct(pid);
-        const cart = await CartManager.getCarts({ _id: id });
+        const carts = await CartManager.getCarts({ _id: id });
+        if (!carts || !carts[0]) return res.status(404).json({ error: 'Cart not found' });
 
-        const item = cart[0].products.find(p => p.product.toString() === pid);
-        if (item) item.quantity += (qty ?? 1);
-        else cart[0].products.push({
-            product: pid,
-            quantity: (qty ?? 1)
-        });
+        const cart = carts[0];
+        const existingProductIndex = cart.products.findIndex(p => p.product._id.toString() === pid);
 
-        await cart[0].save();
+        if (existingProductIndex !== -1) {
+            cart.products[existingProductIndex].quantity += quantity;
+        } else {
+            cart.products.push({
+                product: pid,
+                quantity: quantity
+            });
+        }
 
-        return res.status(200).json({ payload: cart });
+        await cart.save();
+        const updatedCart = await cart.populate('products.product');
+
+        return res.status(200).json({ payload: updatedCart });
     } catch (err) {
-        return res.status(err.status || 500).send({ error: `${err.message}` });
+        return res.status(err.status || 500).json({ error: `${err.message}` });
     }
 });
 

@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             products.forEach(item => {
                 cartDiv.innerHTML = `<ul>
-                    <li>Item: ${item.product}</li>
+                    <li>Item: ${item.product.title} - $${item.product.price}</li>
                     <li>Quantity ${item.quantity}</li>
                 </ul>`;
             });
