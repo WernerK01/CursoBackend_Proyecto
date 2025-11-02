@@ -123,7 +123,6 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     res.setHeader('Content-Type', 'application/json');
 
-
     try {
         await verifyCart(id);
         return res.status(200).json({ payload: await CartManager.deleteCart({ _id: id }) });
@@ -140,7 +139,7 @@ router.delete('/:id/products/:pid', async (req, res) => {
         await verifyCart(id);
         await existProduct(pid);
         const cart = await CartManager.getCarts({ _id: id });
-        cart[0].products = cart[0].products.filter(p => p.product.toString() !== pid);
+        cart[0].products = cart[0].products.filter(p => p.product._id.toString() !== pid);
         await cart[0].save();
         return res.status(200).json({ payload: cart });
     } catch (err) {

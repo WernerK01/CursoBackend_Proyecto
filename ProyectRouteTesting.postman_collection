@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "bb82fb96-eb68-468d-a24e-4e37075321a0",
+		"name": "New",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49308652",
+		"_collection_link": "https://wernerk01-157983.postman.co/workspace/Werner-Koll's-Workspace~ac8569b1-2e41-4231-8c25-145b381eda4a/collection/49308652-bb82fb96-eb68-468d-a24e-4e37075321a0?action=share&source=collection_link&creator=49308652"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "get_products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}products",
+							"host": [
+								"{{baseURL}}products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "stock:10",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post_products",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}products",
+							"host": [
+								"{{baseURL}}products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "put_products",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Teclado\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}products/68fce92636597df1187be4c9",
+							"host": [
+								"{{baseURL}}products"
+							],
+							"path": [
+								"68fce92636597df1187be4c9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_products",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}products",
+							"host": [
+								"{{baseURL}}products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "get_cart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}cart",
+							"host": [
+								"{{baseURL}}cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post_cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}cart",
+							"host": [
+								"{{baseURL}}cart"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_cart",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}cart",
+							"host": [
+								"{{baseURL}}cart"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
