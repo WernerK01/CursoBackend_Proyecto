@@ -24,12 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 cartDiv.innerHTML = '<p>El carrito está vacío.</p>';
                 return;
             }
+            console.log(data.payload[0].products);
+            let totalPay = 0;
             products.forEach(item => {
-                cartDiv.innerHTML = `<ul>
-                    <li>Item: ${item.product.title} - $${item.product.price}</li>
-                    <li>Quantity ${item.quantity}</li>
+                totalPay += item.quantity * item.product.price;
+                cartDiv.innerHTML += `<ul>
+                    <li><strong>Product:</strong> ${item.product.title} - <strong>Total price:</strong> $${item.quantity * item.product.price}</li>
+                    <li><strong>Quantity:</strong> ${item.quantity}</li>
                 </ul>`;
             });
+            cartDiv.innerHTML += `<h3>Total to pay: $${totalPay}</h3>`;
         } catch (err) {
             message.textContent = `Error: ${err.message}`;
             message.className = 'error';
