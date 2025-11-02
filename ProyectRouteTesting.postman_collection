@@ -153,6 +153,20 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "put_cart",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}cart",
+							"host": [
+								"{{baseURL}}cart"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

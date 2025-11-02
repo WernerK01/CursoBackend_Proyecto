@@ -119,6 +119,44 @@ router.post('/:id/products/:pid', async (req, res) => {
     }
 });
 
+router.put('/:cid', async (req, res) => {
+    const { cid } = req.params;
+    const products = req.body; // se espera un array [{ product: "<id>", quantity: <number> }, ...]
+
+    res.setHeader('Content-Type', 'application/json');
+
+    if (!Array.isArray(products)) {
+        return res.status(400).json({ error: 'Body must be an array of products.' });
+    }
+
+    if (!isValidObjectId(cid)) {
+        return res.status(400).json({ error: 'Invalid cart id.' });
+    }
+
+    for (const p of products) {
+        if (!p || !p.product || typeof p.quantity !== 'number') {
+            return res.status(400).json({ error: 'Each item must have product (id) and quantity (number).' });
+        }
+        if (!isValidObjectId(p.product)) {
+            return res.status(400).json({ error: `Invalid product id: ${p.product}` });
+        }
+    }
+
+    try {
+        await Promise.all(products.map(item => existProduct(item.product)));
+
+        const newProductsArr = products.map(p => ({ product: p.product, quantity: p.quantity }));
+
+        const updatedCart = await CartManager.updateCart(cid, { products: newProductsArr });
+
+        if (!updatedCart) return res.status(404).json({ error: 'Cart not found.' });
+
+        return res.status(200).json({ payload: updatedCart });
+    } catch (err) {
+        return res.status(err.status || 500).json({ error: err.message });
+    }
+});
+
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     res.setHeader('Content-Type', 'application/json');
