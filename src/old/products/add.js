@@ -1,12 +1,13 @@
 import express from 'express';
-import { Product } from '../../core/Products.js';
+import { Product } from '../../core/ProductsManager.js';
 const productAddRoute = express.Router();
 
-productAddRoute.get('/', async (req, res) => {
+productAddRoute.post('/', async (req, res) => {
     try {
-        const { name, stock, price } = req.query;
+        const { id, name, stock, price } = req.query;
 
         const product = {
+            id,
             name,
             stock,
             price,

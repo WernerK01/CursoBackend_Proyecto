@@ -1,5 +1,5 @@
 import express from 'express';
-import { Cart } from '../../core/Cart.js';
+import { Cart } from '../../core/CartManager.js';
 const cartGetByIDRoute = express.Router();
 
 cartGetByIDRoute.get('/', async (req, res) => {

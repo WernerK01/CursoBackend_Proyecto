@@ -7,11 +7,12 @@
     <title>{{title}}</title>
 </head>
 <body>
-    <h1>{{title}}</h1>
-    <hr>
-    <div id="products"></div>
+    <div id="message"></div>
+    <form id="form">
+        <input type="text" placeholder="id" id="productId">
+        <button type="submit">Delete Product</button>
+    </form>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/realTimeProducts.js"></script>
+    <script src="/js/remProduct.js"></script>
 </body>
 </html>

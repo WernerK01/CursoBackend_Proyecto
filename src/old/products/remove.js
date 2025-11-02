@@ -1,8 +1,8 @@
 import express from 'express';
-import { Product } from '../../core/Products.js';
+import { Product } from '../../core/ProductsManager.js';
 const productsRemoveRoute = express.Router();
 
-productsRemoveRoute.get('/', async (req, res) => {
+productsRemoveRoute.delete('/', async (req, res) => {
     try {
 
         if (!req.query.id) {

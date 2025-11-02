@@ -1,9 +1,9 @@
 import express from 'express';
-import { Cart } from '../../core/Cart.js';
-import { Product } from '../../core/Products.js';
+import { Cart } from '../../core/CartManager.js';
+import { Product } from '../../core/ProductsManager.js';
 const cartRemoveRoute = express.Router();
 
-cartRemoveRoute.get('/', async (req, res) => {
+cartRemoveRoute.delete('/', async (req, res) => {
     const { productID, quantity = 1 } = req.query;
 
     if ((productID && !parseInt(productID) || !productID) || (quantity && !parseInt(quantity))) {

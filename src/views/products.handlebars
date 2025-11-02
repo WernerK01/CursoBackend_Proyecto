@@ -3,21 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>{{title}}</title>
 </head>
 <body>
   <h1>{{title}}</h1>
   <hr>
-  {{#if Products}}
-      <ul>
-        {{#each Products}}
-          <li><strong>{{this.name}}</strong> - <strong>Stock:</strong> ${{this.stock}} - <strong>Price:</strong> ${{this.price}}</li>
-        {{/each}}
-      </ul>
-    {{/if}}
+    <ul>
+      {{#each products}}
+        <li>
+          <h4>{{this.title}}</h4>
+          <p><span>Precio:</span> ${{this.price}}</p>
+          <p><span>Descripción:</span> {{this.description}}</p>
+          <p><span>Stock:</span> {{this.stock}}</p>
+          <button class="btnAddToCart" data-id="{{this._id}}">Agregar al carrito</button>
+        </li>
+      {{/each}}
+    </ul>
+  <hr>
+  <a href="/views/products?page=1" id="first">Primera página</a>
 
-    {{#if message}}
-      <p><strong>{{type}}:</strong> {{message}}</p>
-    {{/if}}
+  {{#if hasPrevPage}}
+    <a href="/views/products?page={{prevPage}}" id="prev">Página anterior</a>
+  {{else}}
+    <a href="/views/products" id="prev" class="disabled">Página anterior</a>
+  {{/if}}
+  
+  {{#if hasNextPage}}
+    <a href="/views/products?page={{nextPage}}" id="next">Siguente página</a>
+  {{else}}
+    <a href="/views/products" id="next" class="disabled">Siguente página</a>
+  {{/if}}
+
+  <a href="/views/products?page={{totalPages}}" id="last">Ultima página</a>
+
+  <script src="/js/addProduct.js"></script>
 </body>
 </html>

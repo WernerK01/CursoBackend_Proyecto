@@ -1,18 +1,11 @@
 import express from 'express';
 import handlebars from 'express-handlebars';
-import { Product } from './core/Products.js';
 import { Server } from 'socket.io';
-
-import cartRoute from './routes/cart/cart.js';
-import cartAddRoute from './routes/cart/add.js';
-import cartGetByIDRoute from './routes/cart/get.js';
-import cartRemoveRoute from './routes/cart/remove.js';
-
-import productsRoute from './routes/products/products.js';
-import productAddRoute from './routes/products/add.js';
-import productGetByIDRoute from './routes/products/get.js';
-import productsRemoveRoute from './routes/products/remove.js';
-import realTimeProductRoute from './routes/products/realTimeProducts.js';
+import { connection } from './mongo/connection.js';
+import { ProductManager } from './core/ProductsManager.js';
+import { router as cartRoute } from './routes/cartRoute.js';
+import { router as productRoute } from './routes/productRoute.js';
+import { router as viewsRoute } from './routes/viewsRoute.js';
 
 const port = 3000;
 const server = express();
@@ -23,37 +16,24 @@ server.use(express.static('./src/public'));
 
 server.set('view engine', 'handlebars');
 server.set('views', './src/views');
-
 server.engine('handlebars', handlebars.engine());
 
-
 const serverHTTP = server.listen(port, async () => {
-  await Product.getProducts();
+  await connection();
   console.log(`[READY] Server is running on http://localhost:${port}`);
 });
 
 server.get('/', (req, res) => {
-  res.render('layouts/main', { title: '¡Hello new costumer!', message: 'Please for use our services in the link type \'/cart\' or \'/products\'.\n\n¡Thanks you' });
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).send('Welcome to the E-Commerce API');
 });
 
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= PRODUCT PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 const socket = new Server(serverHTTP);
 setInterval(async () => {
-  const products = await Product.getProducts();
+  const products = await ProductManager.getProducts();
   socket.emit('realTimeProducts', products);
-  let temp = Math.floor(Math.random() * 100);
-  socket.emit('temp', temp);
 }, 1000);
 
-
-server.use('/products', productsRoute);
-server.use('/products/add', productAddRoute);
-server.use('/products/get', productGetByIDRoute);
-server.use('/products/remove', productsRemoveRoute);
-server.use('/realTimeProducts', realTimeProductRoute);
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= CART PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-server.use('/cart', cartRoute);
-server.use('/cart/add', cartAddRoute);
-server.use('/cart/get', cartGetByIDRoute);
-server.use('/cart/remove', cartRemoveRoute);
+server.use('/views', viewsRoute)
+server.use('/api/products', productRoute);
+server.use('/api/cart', cartRoute);

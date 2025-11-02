@@ -1,5 +1,5 @@
 import express from 'express';
-import { Product } from '../../core/Products.js';
+import { Product } from '../../core/ProductsManager.js';
 const realTimeProductRoute = express.Router();
 
 realTimeProductRoute.get('/', (req, res) => {

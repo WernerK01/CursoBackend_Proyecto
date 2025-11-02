@@ -1,0 +1,32 @@
+[
+     {
+          "name": "Teclado",
+          "stock": 138,
+          "price": 150,
+          "id": 1
+     },
+     {
+          "name": "Mouse",
+          "stock": 30,
+          "price": 200,
+          "id": 2
+     },
+     {
+          "name": "pc",
+          "stock": 10,
+          "price": 500,
+          "id": 4
+     },
+     {
+          "id": 5,
+          "name": "test",
+          "stock": "15",
+          "price": "50"
+     },
+     {
+          "id": 7,
+          "name": "lampara",
+          "stock": 15,
+          "price": "150"
+     }
+]
